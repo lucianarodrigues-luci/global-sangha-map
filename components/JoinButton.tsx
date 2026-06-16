@@ -57,20 +57,33 @@ export function JoinButton({
     );
   }
 
-  // 2. Email only → visible, copyable contact address.
+  // 2. Email only → the "Ask to Join" pill (opens the visitor's mail app) AND
+  //    the address shown in plain text, so it still works / is copyable when no
+  //    mail client is configured.
   if (event.contactEmail) {
     const subject = encodeURIComponent(`Joining: ${event.title}`);
+    const mailto = `mailto:${event.contactEmail}?subject=${subject}`;
+    const sizing = size === "sm" ? "px-3 py-1.5 text-sm" : "px-4 py-2.5 text-base";
     return (
-      <p className={`text-sm text-space-blue/80 ${className}`}>
-        <span className="text-muted">Ask to join — email </span>
+      <div className={`space-y-1.5 ${className}`}>
         <a
-          href={`mailto:${event.contactEmail}?subject=${subject}`}
-          aria-label={`Email to join ${event.title}: ${event.contactEmail}`}
-          className="font-semibold text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary"
+          href={mailto}
+          aria-label={`Ask to Join: ${event.title}`}
+          className={`inline-flex items-center justify-center gap-1.5 rounded-full bg-primary font-semibold text-white shadow-soft transition-colors duration-200 hover:bg-[#15336b] focus-visible:bg-[#15336b] ${sizing}`}
         >
-          {event.contactEmail}
+          Ask to Join
+          <span aria-hidden="true">→</span>
         </a>
-      </p>
+        <p className="text-xs text-space-blue/70">
+          <span className="text-muted">email </span>
+          <a
+            href={mailto}
+            className="font-semibold text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary"
+          >
+            {event.contactEmail}
+          </a>
+        </p>
+      </div>
     );
   }
 
