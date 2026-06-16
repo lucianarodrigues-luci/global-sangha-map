@@ -5,14 +5,16 @@ around the world. It reads events automatically from a public Google Calendar,
 determines where each activity takes place, and displays them on a calm,
 welcoming map — reinforcing the feeling of a global sangha.
 
-Built as a production-quality MVP, deployable on the Vercel free tier with
-minimal ongoing maintenance.
+Built as a production-quality MVP, deployed on Netlify with minimal ongoing
+maintenance.
+
+**Live:** https://global-sangha-map.netlify.app
 
 ---
 
 ## Tech stack
 
-- **Next.js 15** (App Router) + **React 19** + **TypeScript**
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
 - **TailwindCSS** (brand palette baked into the theme)
 - **Leaflet** + **React Leaflet** + **react-leaflet-cluster**, OpenStreetMap tiles
 - **Google Calendar API v3** for event data
@@ -119,22 +121,41 @@ local timezone** (auto-detected in the browser).
   same location is never geocoded twice. A seed cache is committed for common
   locations.
 
-> **Vercel note:** the serverless filesystem is read-only except `/tmp`, so
+> **Netlify note:** the serverless filesystem is read-only except `/tmp`, so
 > write-through to the committed cache only persists during local development.
-> On Vercel, the committed seed cache is read at runtime (keeping known
+> On Netlify, the committed seed cache is read at runtime (keeping known
 > locations free), and newly geocoded locations are cached in `/tmp` for the
 > life of the instance. A durable KV/DB-backed cache is the production path and
 > is intentionally out of scope for the MVP.
 
 ---
 
-## Deploying to Vercel
+## Deploying to Netlify
 
-1. Push this repository to GitHub/GitLab/Bitbucket.
-2. **Import the project** in Vercel (it auto-detects Next.js; see `vercel.json`).
-3. Add the environment variables from `.env.example` in
-   **Project Settings → Environment Variables**.
-4. Deploy. The free tier is sufficient for the MVP.
+The site is deployed on Netlify (`global-sangha-map`,
+https://global-sangha-map.netlify.app). Build settings live in `netlify.toml`
+(uses the official `@netlify/plugin-nextjs` runtime).
+
+1. Connect the repository to the Netlify site (or deploy with the Netlify CLI:
+   `netlify deploy --prod`).
+2. Add the environment variables from `.env.example` in
+   **Site settings → Environment variables** — most importantly
+   `GOOGLE_CALENDAR_API_KEY` to switch from sample data to the live calendar.
+3. Trigger a deploy. The free tier is sufficient for the MVP.
+
+---
+
+## Demo vs. live data (branch workflow)
+
+The app switches data source based purely on whether
+`GOOGLE_CALENDAR_API_KEY` is set (see `lib/calendar.ts`) — no code change is
+needed to flip between them:
+
+- **`main`** — demo branch. With no API key configured it serves the bundled
+  **sample events** (`data/sample-events.json`), ideal for MVP demo meetings.
+- **`live-calendar`** — working branch for the real calendar. Set
+  `GOOGLE_CALENDAR_API_KEY` in `.env.local` (local) and in the Netlify site
+  environment (deploy) to load real events.
 
 ---
 
