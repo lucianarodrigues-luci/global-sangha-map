@@ -8,6 +8,26 @@ import {
 } from "./parser";
 import { geocode } from "./geocoder";
 import { knownLocationQuery } from "./known-locations";
+import tzlookup from "tz-lookup";
+
+/**
+ * Resolve the IANA timezone of a physical venue from its coordinates so an
+ * event's time is shown in the venue's LOCAL time (e.g. a New York event shows
+ * New York time), regardless of which timezone it was authored in on Google
+ * Calendar. Falls back to the authored timezone if lookup fails.
+ */
+function venueTimeZone(
+  lat: number | undefined,
+  lon: number | undefined,
+  fallback?: string
+): string | undefined {
+  if (typeof lat !== "number" || typeof lon !== "number") return fallback;
+  try {
+    return tzlookup(lat, lon);
+  } catch {
+    return fallback;
+  }
+}
 import sampleEventsRaw from "@/data/sample-events.json";
 
 /**
@@ -158,6 +178,14 @@ async function toDomainEvent(raw: GCalEvent): Promise<Event> {
   const isOnlineOnly = explicitlyOnline || !geo;
   const isHybrid = !isOnlineOnly && hasOnlineComponent(joinInfo, title, raw.description);
 
+  // For events with a physical venue, prefer the venue's local timezone so the
+  // displayed time is the time *at the venue* (not whichever zone the event was
+  // authored in). Online-only events keep their authored timezone.
+  const authoredTz = start.timezone || end.timezone;
+  const timezone = geo
+    ? venueTimeZone(geo.latitude, geo.longitude, authoredTz)
+    : authoredTz;
+
   return {
     id: raw.id,
     title,
@@ -171,7 +199,7 @@ async function toDomainEvent(raw: GCalEvent): Promise<Event> {
     joinUrl: joinInfo.joinUrl,
     joinUrlKind: joinInfo.joinUrlKind,
     contactEmail: joinInfo.contactEmail,
-    timezone: start.timezone || end.timezone,
+    timezone,
     isOnlineOnly,
     isHybrid,
     allDay,
