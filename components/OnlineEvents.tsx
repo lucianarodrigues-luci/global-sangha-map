@@ -39,9 +39,11 @@ export function OnlineEvents({
           const localTime = formatTimeInZone(event.startDate, visitorTimeZone);
           const localTz = timeZoneLabel(event.startDate, visitorTimeZone);
           const showLocal =
+            !event.allDay &&
             Boolean(visitorTimeZone) &&
             event.timezone !== visitorTimeZone &&
             time !== localTime;
+          const hasCta = Boolean(event.joinUrl || event.contactEmail);
           return (
             <li
               key={event.id}
@@ -51,16 +53,29 @@ export function OnlineEvents({
                 {event.title}
               </h3>
               <p className="text-sm text-space-blue/80">
-                🕑 {time} {tz}
-                {showLocal && (
-                  <span className="text-space-blue/60">
-                    {" "}
-                    · Your time: {localTime} {localTz}
-                  </span>
+                🕑{" "}
+                {event.allDay ? (
+                  "All day"
+                ) : (
+                  <>
+                    {time} {tz}
+                    {showLocal && (
+                      <span className="text-space-blue/60">
+                        {" "}
+                        · Your time: {localTime} {localTz}
+                      </span>
+                    )}
+                  </>
                 )}
               </p>
               <div className="mt-auto">
-                <JoinButton event={event} size="sm" />
+                {hasCta ? (
+                  <JoinButton event={event} size="sm" />
+                ) : (
+                  <p className="text-xs italic text-muted">
+                    No link provided — contact the community.
+                  </p>
+                )}
               </div>
             </li>
           );

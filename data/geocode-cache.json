@@ -88,21 +88,10 @@
     "longitude": 0,
     "notFound": true
   },
-  "online kathmandu in nepali": {
-    "latitude": 0,
-    "longitude": 0,
-    "notFound": true
-  },
   "joy of living online patan": {
     "latitude": 0,
     "longitude": 0,
     "notFound": true
-  },
-  "online east sussex": {
-    "latitude": 50.8999012,
-    "longitude": 0.2735154,
-    "city": "Wealden",
-    "country": "United Kingdom"
   },
   "melbourne": {
     "latitude": -37.8142454,
@@ -121,12 +110,6 @@
     "longitude": 0,
     "notFound": true
   },
-  "community": {
-    "latitude": 11.5643839,
-    "longitude": 104.8476656,
-    "city": "Khan Pou Senchey",
-    "country": "Cambodia"
-  },
   "east sussex in person": {
     "latitude": 0,
     "longitude": 0,
@@ -137,12 +120,6 @@
     "longitude": -73.5698065,
     "city": "Montreal",
     "country": "Canada"
-  },
-  "madison hybrid": {
-    "latitude": 34.6109921,
-    "longitude": -86.6229445,
-    "city": "Alabama",
-    "country": "United States"
   },
   "portland": {
     "latitude": 45.5202471,
@@ -199,15 +176,85 @@
     "city": "Paris",
     "country": "France"
   },
-  "germany": {
-    "latitude": 51.1638175,
-    "longitude": 10.4478313,
-    "country": "Germany"
-  },
   "nectar of path kathmandu in english": {
     "latitude": 0,
     "longitude": 0,
     "notFound": true
+  },
+  "enjoying aging and wisdom": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "joy of living practice kendal practice": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "white tara online": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "joy of living patan": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "east sussex, england, united kingdom": {
+    "latitude": 50.9404266,
+    "longitude": 0.3699978,
+    "city": "England",
+    "country": "United Kingdom"
+  },
+  "melbourne, victoria, australia": {
+    "latitude": -37.8142454,
+    "longitude": 144.9631732,
+    "city": "Melbourne",
+    "country": "Australia"
+  },
+  "new york, new york, united states": {
+    "latitude": 40.7127281,
+    "longitude": -74.0060152,
+    "city": "New York",
+    "country": "United States"
+  },
+  "medford, oregon, united states": {
+    "latitude": 42.3264181,
+    "longitude": -122.8718605,
+    "city": "Medford",
+    "country": "United States"
+  },
+  "madison, wisconsin, united states": {
+    "latitude": 43.07469,
+    "longitude": -89.3841663,
+    "city": "Madison",
+    "country": "United States"
+  },
+  "patan english language": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "in english and nepali": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "joy of living kendal": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "online meeting with zoom (link send after registration)": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "germany": {
+    "latitude": 51.1638175,
+    "longitude": 10.4478313,
+    "country": "Germany"
   },
   "toronto east": {
     "latitude": 54.671467,
@@ -220,31 +267,5 @@
     "longitude": -79.3839347,
     "city": "Toronto",
     "country": "Canada"
-  },
-  "enjoying aging and wisdom": {
-    "latitude": 0,
-    "longitude": 0,
-    "notFound": true
-  },
-  "joy of living practice kendal practice": {
-    "latitude": 0,
-    "longitude": 0,
-    "notFound": true
-  },
-  "online,": {
-    "latitude": 43.5904719,
-    "longitude": 3.8595132,
-    "city": "Montpellier",
-    "country": "France"
-  },
-  "white tara online": {
-    "latitude": 0,
-    "longitude": 0,
-    "notFound": true
-  },
-  "jjoy of living edinburgh": {
-    "latitude": 0,
-    "longitude": 0,
-    "notFound": true
   }
 }

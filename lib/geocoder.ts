@@ -30,17 +30,37 @@ async function throttle(): Promise<void> {
   lastRequestAt = Date.now();
 }
 
+interface NominatimAddress {
+  city?: string;
+  town?: string;
+  village?: string;
+  municipality?: string;
+  state?: string;
+  country?: string;
+}
+
 interface NominatimResult {
   lat: string;
   lon: string;
-  address?: {
-    city?: string;
-    town?: string;
-    village?: string;
-    municipality?: string;
-    state?: string;
-    country?: string;
-  };
+  addresstype?: string;
+  address?: NominatimAddress;
+}
+
+/** A real settlement name from a Nominatim address, if any. */
+function settlementName(addr: NominatimAddress): string | undefined {
+  return addr.city || addr.town || addr.village || addr.municipality;
+}
+
+/**
+ * Pick the best candidate from Nominatim's (importance-sorted) results.
+ * Prefer the first result that resolves to an actual settlement (city/town/
+ * village) over one that is only a county/state/region — this is what keeps
+ * "Madison" on the city in Wisconsin instead of Madison County, Alabama.
+ */
+function pickBestCandidate(results: NominatimResult[]): NominatimResult | undefined {
+  if (!results.length) return undefined;
+  const withSettlement = results.find((r) => settlementName(r.address ?? {}));
+  return withSettlement ?? results[0];
 }
 
 /**
@@ -63,7 +83,9 @@ export async function geocode(query: string | undefined): Promise<GeocodeResult 
     url.searchParams.set("q", query);
     url.searchParams.set("format", "jsonv2");
     url.searchParams.set("addressdetails", "1");
-    url.searchParams.set("limit", "1");
+    // Fetch a few candidates so we can prefer a real settlement over a
+    // county/state match (see pickBestCandidate).
+    url.searchParams.set("limit", "5");
     url.searchParams.set("email", contactEmail());
 
     const res = await fetch(url.toString(), {
@@ -80,18 +102,18 @@ export async function geocode(query: string | undefined): Promise<GeocodeResult 
     }
 
     const data = (await res.json()) as NominatimResult[];
-    if (!data.length) {
+    const top = pickBestCandidate(data);
+    if (!top) {
       // Remember the miss so we don't retry it every refresh.
       await setCached(query, { latitude: 0, longitude: 0, notFound: true });
       return undefined;
     }
 
-    const top = data[0];
     const addr = top.address ?? {};
     const result: GeocodeResult = {
       latitude: parseFloat(top.lat),
       longitude: parseFloat(top.lon),
-      city: addr.city || addr.town || addr.village || addr.municipality || addr.state,
+      city: settlementName(addr) || addr.state,
       country: addr.country,
     };
 

@@ -23,7 +23,38 @@ const ONLINE_KEYWORDS = [
 ];
 
 /** Words/phrases that, when they make up the whole location, mean "no place". */
-const ONLINE_LOCATION_VALUES = ["online", "virtual", "zoom", "remote", "tbd", "n/a"];
+const ONLINE_LOCATION_VALUES = [
+  "online",
+  "online only",
+  "virtual",
+  "virtual only",
+  "zoom",
+  "remote",
+  "tbd",
+  "tba",
+  "n/a",
+  "na",
+  "-",
+];
+
+/**
+ * Noise phrases that describe the *format* of an event, not its place. They are
+ * stripped before geocoding so "Tergar Madison (Hybrid)" → "Tergar Madison" and
+ * "East Sussex — in person" → "East Sussex".
+ */
+const FORMAT_NOISE = [
+  "in person",
+  "in-person",
+  "inperson",
+  "hybrid",
+  "online",
+  "virtual",
+  "via zoom",
+  "zoom",
+  "livestream",
+  "live stream",
+  "webcast",
+];
 
 const URL_REGEX = /https?:\/\/[^\s<>")\]]+/gi;
 const EMAIL_REGEX = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi;
@@ -54,6 +85,7 @@ export function decodeHtml(input: string): string {
 
 export interface JoinInfo {
   joinUrl?: string;
+  joinUrlKind?: "zoom" | "registration" | "website";
   contactEmail?: string;
 }
 
@@ -96,10 +128,42 @@ export function detectJoinInfo(...texts: (string | undefined)[]): JoinInfo {
 
   const { zoom, registration, website } = categorizeUrls(urls);
 
-  const joinUrl = zoom[0] || registration[0] || website[0];
+  let joinUrl: string | undefined;
+  let joinUrlKind: JoinInfo["joinUrlKind"];
+  if (zoom[0]) {
+    joinUrl = zoom[0];
+    joinUrlKind = "zoom";
+  } else if (registration[0]) {
+    joinUrl = registration[0];
+    joinUrlKind = "registration";
+  } else if (website[0]) {
+    joinUrl = website[0];
+    joinUrlKind = "website";
+  }
+
   const contactEmail = emails[0];
 
-  return { joinUrl, contactEmail };
+  return { joinUrl, joinUrlKind, contactEmail };
+}
+
+/**
+ * True when an event offers an online way to attend (a Zoom link, or an
+ * explicit online/hybrid signal in its text) — used to flag hybrid events that
+ * ALSO have a physical location.
+ */
+export function hasOnlineComponent(
+  joinInfo: JoinInfo,
+  title: string | undefined,
+  description: string | undefined
+): boolean {
+  if (joinInfo.joinUrlKind === "zoom") return true;
+  const haystack = `${title ?? ""}\n${decodeHtml(description ?? "")}`.toLowerCase();
+  return (
+    haystack.includes("hybrid") ||
+    haystack.includes("via zoom") ||
+    haystack.includes("online") ||
+    ONLINE_KEYWORDS.some((kw) => haystack.includes(kw))
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -124,6 +188,17 @@ const TITLE_NOISE = [
   "session",
   "with",
   "the",
+  "hybrid",
+  "online",
+  "virtual",
+  "in person",
+  "in-person",
+  "inperson",
+  "practice",
+  "curriculum",
+  "community",
+  "center",
+  "centre",
 ];
 
 /**
@@ -137,19 +212,18 @@ const TITLE_NOISE = [
  */
 export function extractLocationFromTitle(title: string | undefined): string | undefined {
   if (!title) return undefined;
-  let text = ` ${title} `;
 
-  // Prefer the token(s) immediately after "Tergar".
+  // Only trust the high-precision "Tergar <Place>" pattern. We deliberately do
+  // NOT fall back to geocoding arbitrary leftover title words: that produced
+  // garbage placements (e.g. "White Tara" → Mexico, "Joy of Living" → a US
+  // township). Centers whose name doesn't follow this pattern should be added
+  // to KNOWN_LOCATIONS instead.
   const tergarMatch = title.match(/Tergar\s+([A-ZÀ-Ý][\wÀ-ÿ'’.-]*(?:\s+[A-ZÀ-Ý][\wÀ-ÿ'’.-]*)?)/);
   if (tergarMatch) {
     const candidate = stripNoise(tergarMatch[1]);
     if (candidate) return candidate;
   }
-
-  // Otherwise strip Tergar + known noise words and keep capitalized remainder.
-  text = text.replace(/Tergar/gi, " ");
-  const candidate = stripNoise(text);
-  return candidate || undefined;
+  return undefined;
 }
 
 function stripNoise(input: string): string | undefined {
@@ -188,7 +262,8 @@ export function detectLocationQuery(
   // Method 1: explicit Location field.
   const loc = rawLocation?.trim();
   if (loc && !isOnlineLocationValue(loc)) {
-    return { query: loc, source: "location" };
+    const cleaned = cleanLocationQuery(loc);
+    if (cleaned) return { query: cleaned, source: "location" };
   }
 
   // Method 2: extract from title.
@@ -206,6 +281,30 @@ export function detectLocationQuery(
   return { source: "none" };
 }
 
+/**
+ * Strip format-noise ("hybrid", "online", "in person", "via zoom", …) and the
+ * leftover separators from a location string so the geocoder sees only the
+ * place. E.g. "Online, Tergar Melbourne" → "Tergar Melbourne",
+ * "East Sussex — in person" → "East Sussex".
+ */
+export function cleanLocationQuery(input: string): string | undefined {
+  let text = ` ${input} `;
+  for (const phrase of FORMAT_NOISE) {
+    text = text.replace(new RegExp(`\\b${escapeRegExp(phrase)}\\b`, "gi"), " ");
+  }
+  // Collapse separators/punctuation left dangling by removed words.
+  text = text
+    .replace(/[(){}\[\]]/g, " ")
+    .replace(/\s*[,;|/–—-]+\s*/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text || undefined;
+}
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /** Look for an explicit "Location: <place>" or "City: <place>" line in the body. */
 export function extractLocationFromDescription(description: string | undefined): string | undefined {
   if (!description) return undefined;
@@ -219,7 +318,12 @@ export function extractLocationFromDescription(description: string | undefined):
 }
 
 function isOnlineLocationValue(value: string): boolean {
-  const v = value.trim().toLowerCase();
+  // Normalize: lowercase, drop surrounding punctuation/whitespace so values
+  // like "Online," / "(online)" / "online -" are still recognized.
+  const v = value
+    .trim()
+    .toLowerCase()
+    .replace(/^[\s\-–—,;:.()[\]]+|[\s\-–—,;:.()[\]]+$/g, "");
   if (ONLINE_LOCATION_VALUES.includes(v)) return true;
   // A bare URL in the location field means "online".
   if (/^https?:\/\//.test(v)) return true;

@@ -3,9 +3,11 @@ import {
   detectJoinInfo,
   detectLocationQuery,
   looksOnlineOnly,
+  hasOnlineComponent,
   decodeHtml,
 } from "./parser";
 import { geocode } from "./geocoder";
+import { knownLocationQuery } from "./known-locations";
 import sampleEventsRaw from "@/data/sample-events.json";
 
 /**
@@ -135,20 +137,26 @@ async function toDomainEvent(raw: GCalEvent): Promise<Event> {
   const description = decodeHtml(raw.description ?? "");
   const start = normalizeDateTime(raw.start);
   const end = normalizeDateTime(raw.end);
+  const allDay = Boolean(raw.start?.date && !raw.start?.dateTime);
 
-  const { joinUrl, contactEmail } = detectJoinInfo(raw.description, raw.location);
+  const joinInfo = detectJoinInfo(raw.description, raw.location, raw.summary);
 
-  // Determine location query (FR-004 priority order).
+  // Determine location query (FR-004 priority order). A curated override for
+  // known Tergar centers takes precedence so ambiguous city names (e.g.
+  // "Madison") resolve to the correct city.
   const explicitlyOnline = looksOnlineOnly(raw.location, title, raw.description);
   const locationQuery = explicitlyOnline
-    ? { query: undefined, source: "none" as const }
-    : detectLocationQuery(raw.location, title, raw.description);
+    ? undefined
+    : knownLocationQuery(raw.location, title) ??
+      detectLocationQuery(raw.location, title, raw.description).query;
 
   // Resolve coordinates (FR-005, cached permanently).
-  const geo = explicitlyOnline ? undefined : await geocode(locationQuery.query);
+  const geo = explicitlyOnline ? undefined : await geocode(locationQuery);
 
-  // FR-006: no valid/ resolvable location → online-only.
+  // FR-006: no valid/resolvable location → online-only. Otherwise, an event
+  // with a place that ALSO has an online option is hybrid.
   const isOnlineOnly = explicitlyOnline || !geo;
+  const isHybrid = !isOnlineOnly && hasOnlineComponent(joinInfo, title, raw.description);
 
   return {
     id: raw.id,
@@ -160,10 +168,13 @@ async function toDomainEvent(raw: GCalEvent): Promise<Event> {
     country: geo?.country,
     latitude: geo?.latitude,
     longitude: geo?.longitude,
-    joinUrl,
-    contactEmail,
+    joinUrl: joinInfo.joinUrl,
+    joinUrlKind: joinInfo.joinUrlKind,
+    contactEmail: joinInfo.contactEmail,
     timezone: start.timezone || end.timezone,
     isOnlineOnly,
+    isHybrid,
+    allDay,
   };
 }
 

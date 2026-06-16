@@ -2,6 +2,7 @@
 
 import { Event } from "@/types/Event";
 import { JoinButton } from "./JoinButton";
+import { modeBadge } from "@/lib/category";
 import { formatTimeInZone, timeZoneLabel } from "@/lib/datetime";
 
 /**
@@ -28,13 +29,19 @@ export function EventCard({
   const localTz = timeZoneLabel(event.startDate, visitorTimeZone);
 
   const showLocalSeparately =
+    !event.allDay &&
     Boolean(visitorTimeZone) &&
     event.timezone !== visitorTimeZone &&
     originalTime !== localTime;
 
+  const badge = modeBadge(event);
+  const place = [event.city, event.country].filter(Boolean).join(", ");
   const locationLabel = event.isOnlineOnly
     ? "Online"
-    : [event.city, event.country].filter(Boolean).join(", ") || "Location TBD";
+    : event.isHybrid
+    ? `${place || "In person"} · also online`
+    : place || "Location TBD";
+  const hasCta = Boolean(event.joinUrl || event.contactEmail);
 
   return (
     <article
@@ -57,35 +64,45 @@ export function EventCard({
         <h3 className="text-base font-semibold leading-snug text-midnight">
           {event.title}
         </h3>
-        {event.isOnlineOnly && (
-          <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-            Online
-          </span>
-        )}
+        <span
+          className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${badge.className}`}
+        >
+          {badge.label}
+        </span>
       </div>
 
       <dl className="mt-3 space-y-1.5 text-sm text-space-blue/80">
         <div className="flex items-center gap-2">
           <span aria-hidden="true">🕑</span>
           <dd>
-            {originalTime}
-            {originalTz ? ` ${originalTz}` : ""}
-            {showLocalSeparately && (
-              <span className="text-space-blue/60">
-                {" "}
-                · Your time: {localTime} {localTz}
-              </span>
+            {event.allDay ? (
+              "All day"
+            ) : (
+              <>
+                {originalTime}
+                {originalTz ? ` ${originalTz}` : ""}
+                {showLocalSeparately && (
+                  <span className="text-space-blue/60">
+                    {" "}
+                    · Your time: {localTime} {localTz}
+                  </span>
+                )}
+              </>
             )}
           </dd>
         </div>
         <div className="flex items-center gap-2">
-          <span aria-hidden="true">📍</span>
+          <span aria-hidden="true">{event.isOnlineOnly ? "💻" : "📍"}</span>
           <dd>{locationLabel}</dd>
         </div>
       </dl>
 
       <div className="mt-4">
-        <JoinButton event={event} size="sm" />
+        {hasCta ? (
+          <JoinButton event={event} size="sm" />
+        ) : (
+          <p className="text-xs italic text-muted">No link provided — contact the community.</p>
+        )}
       </div>
     </article>
   );

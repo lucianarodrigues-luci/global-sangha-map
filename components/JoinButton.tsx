@@ -4,10 +4,29 @@ import { Event } from "@/types/Event";
  * Call-to-action button (specs.md FR-007, FR-008, FR-009).
  *
  * CTA target priority is resolved upstream in the parser (Zoom → Registration →
- * Website → Email). Here we only choose the label:
- *   - "Join" when there is a direct join/registration/website URL.
- *   - "Ask to Join" when we only have a contact email.
+ * Website → Email). Here we choose an honest label for what the link does, so
+ * an in-person event's "More info" link is never confused with an online
+ * "Join online" link:
+ *   - Zoom link         → "Join online"
+ *   - Registration link → "Register"
+ *   - Website link      → "More info"
+ *   - Email only        → "Ask to Join"
+ * Returns null when the event provides no link at all (caller shows a note).
  */
+function ctaLabel(event: Event): string {
+  if (event.joinUrl) {
+    switch (event.joinUrlKind) {
+      case "zoom":
+        return "Join online";
+      case "registration":
+        return "Register";
+      default:
+        return "More info";
+    }
+  }
+  return "Ask to Join";
+}
+
 export function JoinButton({
   event,
   size = "md",
@@ -25,7 +44,7 @@ export function JoinButton({
 
   if (!href) return null;
 
-  const label = event.joinUrl ? "Join" : "Ask to Join";
+  const label = ctaLabel(event);
   const isExternal = Boolean(event.joinUrl);
 
   const sizing = size === "sm" ? "px-3 py-1.5 text-sm" : "px-4 py-2.5 text-base";

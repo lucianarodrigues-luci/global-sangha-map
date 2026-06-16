@@ -1,4 +1,4 @@
-import { Event, EventCategory } from "@/types/Event";
+import { Event, EventCategory, EventMode, eventMode } from "@/types/Event";
 
 /**
  * Marker color categories, mapped to the official Tergar brand palette
@@ -40,4 +40,18 @@ export function categorize(event: Event): Exclude<EventCategory, "selected"> {
 export function markerColor(event: Event, selected: boolean): string {
   if (selected) return MARKER_COLORS.selected;
   return MARKER_COLORS[categorize(event)];
+}
+
+/**
+ * Visual badge (label + brand-aligned classes) that makes an event's
+ * attendance mode unmistakable: In person / Online / Hybrid.
+ */
+export const MODE_BADGE: Record<EventMode, { label: string; className: string }> = {
+  online: { label: "Online", className: "bg-primary/10 text-primary" },
+  in_person: { label: "In person", className: "bg-space-blue/10 text-space-blue" },
+  hybrid: { label: "Hybrid", className: "bg-gold-tint/70 text-space-blue" },
+};
+
+export function modeBadge(event: Event): { label: string; className: string } {
+  return MODE_BADGE[eventMode(event)];
 }

@@ -8,7 +8,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 
 import { Event } from "@/types/Event";
-import { markerColor } from "@/lib/category";
+import { markerColor, modeBadge } from "@/lib/category";
 import { JoinButton } from "./JoinButton";
 import { formatTimeInZone, timeZoneLabel } from "@/lib/datetime";
 
@@ -117,6 +117,8 @@ export default function WorldMap({
           const selected = event.id === selectedEventId;
           const time = formatTimeInZone(event.startDate, event.timezone);
           const tz = timeZoneLabel(event.startDate, event.timezone);
+          const badge = modeBadge(event);
+          const hasCta = Boolean(event.joinUrl || event.contactEmail);
           return (
             <Marker
               key={event.id}
@@ -129,15 +131,29 @@ export default function WorldMap({
             >
               <Popup>
                 <div className="min-w-[12rem] space-y-1.5">
-                  <h3 className="text-base font-semibold text-midnight">{event.title}</h3>
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-base font-semibold text-midnight">{event.title}</h3>
+                    <span
+                      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${badge.className}`}
+                    >
+                      {badge.label}
+                    </span>
+                  </div>
                   <p className="text-sm text-space-blue/80">
                     📍 {[event.city, event.country].filter(Boolean).join(", ") || "—"}
+                    {event.isHybrid ? " · also online" : ""}
                   </p>
                   <p className="text-sm text-space-blue/80">
-                    🕑 {time} {tz}
+                    🕑 {event.allDay ? "All day" : `${time} ${tz}`}
                   </p>
                   <div className="pt-1">
-                    <JoinButton event={event} size="sm" />
+                    {hasCta ? (
+                      <JoinButton event={event} size="sm" />
+                    ) : (
+                      <p className="text-xs italic text-muted">
+                        No link provided — contact the community.
+                      </p>
+                    )}
                   </div>
                 </div>
               </Popup>
