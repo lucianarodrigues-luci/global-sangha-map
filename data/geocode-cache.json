@@ -1,16 +1,250 @@
 {
-  "tergar madrid": { "latitude": 40.4167754, "longitude": -3.7037902, "city": "Madrid", "country": "Spain" },
-  "madrid, spain": { "latitude": 40.4167754, "longitude": -3.7037902, "city": "Madrid", "country": "Spain" },
-  "tergar são paulo": { "latitude": -23.5557714, "longitude": -46.6395571, "city": "São Paulo", "country": "Brazil" },
-  "são paulo, brazil": { "latitude": -23.5557714, "longitude": -46.6395571, "city": "São Paulo", "country": "Brazil" },
-  "vancouver": { "latitude": 49.2608724, "longitude": -123.1139529, "city": "Vancouver", "country": "Canada" },
-  "vancouver, canada": { "latitude": 49.2608724, "longitude": -123.1139529, "city": "Vancouver", "country": "Canada" },
-  "minneapolis, minnesota, usa": { "latitude": 44.9772995, "longitude": -93.2654692, "city": "Minneapolis", "country": "United States" },
-  "kathmandu, nepal": { "latitude": 27.708317, "longitude": 85.3205817, "city": "Kathmandu", "country": "Nepal" },
-  "london, united kingdom": { "latitude": 51.4893335, "longitude": -0.1440551, "city": "London", "country": "United Kingdom" },
-  "berlin, germany": { "latitude": 52.510885, "longitude": 13.3989367, "city": "Berlin", "country": "Germany" },
-  "singapore": { "latitude": 1.357107, "longitude": 103.8194992, "city": "Singapore", "country": "Singapore" },
-  "sydney, australia": { "latitude": -33.8698439, "longitude": 151.2082848, "city": "Sydney", "country": "Australia" },
-  "mexico city, mexico": { "latitude": 19.4326296, "longitude": -99.1331785, "city": "Mexico City", "country": "Mexico" },
-  "taipei, taiwan": { "latitude": 25.0375198, "longitude": 121.5636796, "city": "Taipei", "country": "Taiwan" }
+  "tergar madrid": {
+    "latitude": 40.4167754,
+    "longitude": -3.7037902,
+    "city": "Madrid",
+    "country": "Spain"
+  },
+  "madrid, spain": {
+    "latitude": 40.4167754,
+    "longitude": -3.7037902,
+    "city": "Madrid",
+    "country": "Spain"
+  },
+  "tergar são paulo": {
+    "latitude": -23.5557714,
+    "longitude": -46.6395571,
+    "city": "São Paulo",
+    "country": "Brazil"
+  },
+  "são paulo, brazil": {
+    "latitude": -23.5557714,
+    "longitude": -46.6395571,
+    "city": "São Paulo",
+    "country": "Brazil"
+  },
+  "vancouver": {
+    "latitude": 49.2608724,
+    "longitude": -123.1139529,
+    "city": "Vancouver",
+    "country": "Canada"
+  },
+  "vancouver, canada": {
+    "latitude": 49.2608724,
+    "longitude": -123.1139529,
+    "city": "Vancouver",
+    "country": "Canada"
+  },
+  "minneapolis, minnesota, usa": {
+    "latitude": 44.9772995,
+    "longitude": -93.2654692,
+    "city": "Minneapolis",
+    "country": "United States"
+  },
+  "kathmandu, nepal": {
+    "latitude": 27.708317,
+    "longitude": 85.3205817,
+    "city": "Kathmandu",
+    "country": "Nepal"
+  },
+  "london, united kingdom": {
+    "latitude": 51.4893335,
+    "longitude": -0.1440551,
+    "city": "London",
+    "country": "United Kingdom"
+  },
+  "berlin, germany": {
+    "latitude": 52.510885,
+    "longitude": 13.3989367,
+    "city": "Berlin",
+    "country": "Germany"
+  },
+  "singapore": {
+    "latitude": 1.357107,
+    "longitude": 103.8194992,
+    "city": "Singapore",
+    "country": "Singapore"
+  },
+  "sydney, australia": {
+    "latitude": -33.8698439,
+    "longitude": 151.2082848,
+    "city": "Sydney",
+    "country": "Australia"
+  },
+  "mexico city, mexico": {
+    "latitude": 19.4326296,
+    "longitude": -99.1331785,
+    "city": "Mexico City",
+    "country": "Mexico"
+  },
+  "taipei, taiwan": {
+    "latitude": 25.0375198,
+    "longitude": 121.5636796,
+    "city": "Taipei",
+    "country": "Taiwan"
+  },
+  "práctica de néctar del sendero": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "online kathmandu in nepali": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "joy of living online patan": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "online east sussex": {
+    "latitude": 50.8999012,
+    "longitude": 0.2735154,
+    "city": "Wealden",
+    "country": "United Kingdom"
+  },
+  "melbourne": {
+    "latitude": -37.8142454,
+    "longitude": 144.9631732,
+    "city": "Melbourne",
+    "country": "Australia"
+  },
+  "new york": {
+    "latitude": 40.7127281,
+    "longitude": -74.0060152,
+    "city": "New York",
+    "country": "United States"
+  },
+  "club de lectura cada 15 días": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "community": {
+    "latitude": 11.5643839,
+    "longitude": 104.8476656,
+    "city": "Khan Pou Senchey",
+    "country": "Cambodia"
+  },
+  "east sussex in person": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "montreal": {
+    "latitude": 45.5031824,
+    "longitude": -73.5698065,
+    "city": "Montreal",
+    "country": "Canada"
+  },
+  "madison hybrid": {
+    "latitude": 34.6109921,
+    "longitude": -86.6229445,
+    "city": "Alabama",
+    "country": "United States"
+  },
+  "portland": {
+    "latitude": 45.5202471,
+    "longitude": -122.674194,
+    "city": "Portland",
+    "country": "United States"
+  },
+  "zurich": {
+    "latitude": 47.3744489,
+    "longitude": 8.5410422,
+    "city": "Zurich",
+    "country": "Switzerland"
+  },
+  "edinburgh": {
+    "latitude": 55.9533456,
+    "longitude": -3.1883749,
+    "city": "City of Edinburgh",
+    "country": "United Kingdom"
+  },
+  "joy of living st. augustine": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "online patan english language": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "online in english and nepali": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "lyon": {
+    "latitude": 45.7578137,
+    "longitude": 4.8320114,
+    "city": "Lyon",
+    "country": "France"
+  },
+  "joy of living virtual": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "club de lecture 'pour l'amour du monde' de mingyur rinpoche brussels": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "paris": {
+    "latitude": 48.8534951,
+    "longitude": 2.3483915,
+    "city": "Paris",
+    "country": "France"
+  },
+  "germany": {
+    "latitude": 51.1638175,
+    "longitude": 10.4478313,
+    "country": "Germany"
+  },
+  "nectar of path kathmandu in english": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "toronto east": {
+    "latitude": 54.671467,
+    "longitude": -1.6927562,
+    "city": "Bishop Auckland",
+    "country": "United Kingdom"
+  },
+  "toronto": {
+    "latitude": 43.6534817,
+    "longitude": -79.3839347,
+    "city": "Toronto",
+    "country": "Canada"
+  },
+  "enjoying aging and wisdom": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "joy of living practice kendal practice": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "online,": {
+    "latitude": 43.5904719,
+    "longitude": 3.8595132,
+    "city": "Montpellier",
+    "country": "France"
+  },
+  "white tara online": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  },
+  "jjoy of living edinburgh": {
+    "latitude": 0,
+    "longitude": 0,
+    "notFound": true
+  }
 }
