@@ -1,0 +1,18 @@
+# Netlify deployment configuration for the Global Sangha Map (Next.js 16).
+#
+# Netlify auto-detects Next.js and installs the official runtime, but we declare
+# it explicitly here for clarity and reproducibility.
+
+[build]
+  command = "next build"
+  # The Next.js runtime reads the build output from .next.
+  publish = ".next"
+
+[build.environment]
+  # Next.js 16 requires Node >= 20.9. Pin an LTS version for stable builds.
+  NODE_VERSION = "22"
+
+# Official Netlify Next.js runtime (OpenNext-based). Handles SSR, ISR,
+# Route Handlers, Server Actions and fine-grained caching.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

@@ -1,0 +1,71 @@
+"use client";
+
+import { Event } from "@/types/Event";
+import { JoinButton } from "./JoinButton";
+import { formatTimeInZone, timeZoneLabel } from "@/lib/datetime";
+
+/**
+ * Online events section (specs.md FR-006).
+ * Section title is exactly "Online Global Activities".
+ * These events do not appear on the map.
+ */
+export function OnlineEvents({
+  events,
+  visitorTimeZone,
+}: {
+  events: Event[];
+  visitorTimeZone: string;
+}) {
+  if (events.length === 0) return null;
+
+  return (
+    <section aria-label="Online Global Activities" className="rounded-2xl bg-card p-5 shadow-soft sm:p-6">
+      <div className="mb-4 flex items-center gap-2">
+        <span aria-hidden="true" className="text-xl">
+          💻
+        </span>
+        <h2 className="text-lg font-bold text-midnight sm:text-xl">
+          Online Global Activities
+        </h2>
+        <span className="ml-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-sm font-semibold text-primary">
+          {events.length}
+        </span>
+      </div>
+
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {events.map((event) => {
+          const time = formatTimeInZone(event.startDate, event.timezone);
+          const tz = timeZoneLabel(event.startDate, event.timezone);
+          const localTime = formatTimeInZone(event.startDate, visitorTimeZone);
+          const localTz = timeZoneLabel(event.startDate, visitorTimeZone);
+          const showLocal =
+            Boolean(visitorTimeZone) &&
+            event.timezone !== visitorTimeZone &&
+            time !== localTime;
+          return (
+            <li
+              key={event.id}
+              className="flex flex-col gap-3 rounded-2xl border border-hairline bg-canvas p-4"
+            >
+              <h3 className="text-base font-semibold leading-snug text-midnight">
+                {event.title}
+              </h3>
+              <p className="text-sm text-space-blue/80">
+                🕑 {time} {tz}
+                {showLocal && (
+                  <span className="text-space-blue/60">
+                    {" "}
+                    · Your time: {localTime} {localTz}
+                  </span>
+                )}
+              </p>
+              <div className="mt-auto">
+                <JoinButton event={event} size="sm" />
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}

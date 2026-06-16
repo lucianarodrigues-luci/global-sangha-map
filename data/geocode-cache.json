@@ -1,0 +1,16 @@
+{
+  "tergar madrid": { "latitude": 40.4167754, "longitude": -3.7037902, "city": "Madrid", "country": "Spain" },
+  "madrid, spain": { "latitude": 40.4167754, "longitude": -3.7037902, "city": "Madrid", "country": "Spain" },
+  "tergar são paulo": { "latitude": -23.5557714, "longitude": -46.6395571, "city": "São Paulo", "country": "Brazil" },
+  "são paulo, brazil": { "latitude": -23.5557714, "longitude": -46.6395571, "city": "São Paulo", "country": "Brazil" },
+  "vancouver": { "latitude": 49.2608724, "longitude": -123.1139529, "city": "Vancouver", "country": "Canada" },
+  "vancouver, canada": { "latitude": 49.2608724, "longitude": -123.1139529, "city": "Vancouver", "country": "Canada" },
+  "minneapolis, minnesota, usa": { "latitude": 44.9772995, "longitude": -93.2654692, "city": "Minneapolis", "country": "United States" },
+  "kathmandu, nepal": { "latitude": 27.708317, "longitude": 85.3205817, "city": "Kathmandu", "country": "Nepal" },
+  "london, united kingdom": { "latitude": 51.4893335, "longitude": -0.1440551, "city": "London", "country": "United Kingdom" },
+  "berlin, germany": { "latitude": 52.510885, "longitude": 13.3989367, "city": "Berlin", "country": "Germany" },
+  "singapore": { "latitude": 1.357107, "longitude": 103.8194992, "city": "Singapore", "country": "Singapore" },
+  "sydney, australia": { "latitude": -33.8698439, "longitude": 151.2082848, "city": "Sydney", "country": "Australia" },
+  "mexico city, mexico": { "latitude": 19.4326296, "longitude": -99.1331785, "city": "Mexico City", "country": "Mexico" },
+  "taipei, taiwan": { "latitude": 25.0375198, "longitude": 121.5636796, "city": "Taipei", "country": "Taiwan" }
+}

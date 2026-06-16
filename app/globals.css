@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #1b4087; /* Tergar Blue */
+  --color-gold: #e39f24; /* Tergar Gold */
+  --color-space-blue: #424a58;
+  --color-canvas: #f9f9fb;
+  --color-hairline: #c1c7d1;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-canvas text-space-blue font-sans;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-serif text-midnight;
+  }
+
+  /* Respect users who prefer reduced motion (accessibility). */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  /* Visible focus ring for keyboard navigation (accessibility / WCAG). */
+  :focus-visible {
+    outline: 3px solid #e39f24; /* Tergar Gold — high-visibility focus */
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* ── Leaflet adjustments ──────────────────────────────────────────────────── */
+.leaflet-container {
+  font-family: inherit;
+  background: #eef1f4;
+}
+
+/* Soft, brand-aligned popup styling. */
+.leaflet-popup-content-wrapper {
+  border-radius: 1rem;
+  box-shadow: 0 8px 40px rgba(66, 74, 88, 0.12);
+}
+
+.leaflet-popup-content {
+  margin: 1rem 1.25rem;
+}
+
+/* Custom marker pins (set via divIcon). */
+.sangha-marker {
+  border-radius: 9999px;
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(41, 43, 51, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sangha-marker:hover {
+  transform: scale(1.15);
+}
+
+/* Marker cluster bubble styling, brand-aligned. */
+.marker-cluster-sangha {
+  background: rgba(143, 182, 243, 0.35);
+  border-radius: 9999px;
+}
+
+.marker-cluster-sangha div {
+  background: #1b4087;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 9999px;
+  width: 34px;
+  height: 34px;
+  margin-left: 3px;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

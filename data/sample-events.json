@@ -1,0 +1,82 @@
+[
+  {
+    "id": "sample-madrid",
+    "summary": "Hosted by Tergar Madrid",
+    "description": "Weekly meditation practice group. Join us in person or online.\nZoom: https://zoom.us/j/123456789\nQuestions? madrid@tergar.org",
+    "location": "Madrid, Spain",
+    "startOffsetDays": 0,
+    "startTime": "18:00",
+    "endTime": "19:30",
+    "timeZone": "Europe/Madrid"
+  },
+  {
+    "id": "sample-saopaulo",
+    "summary": "Tergar São Paulo Practice Group",
+    "description": "Grupo de prática semanal. Inscreva-se: https://www.eventbrite.com/e/tergar-sp",
+    "location": "São Paulo, Brazil",
+    "startOffsetDays": 0,
+    "startTime": "19:00",
+    "endTime": "20:30",
+    "timeZone": "America/Sao_Paulo"
+  },
+  {
+    "id": "sample-vancouver",
+    "summary": "Vancouver Community Meditation",
+    "description": "All are welcome. More info at https://tergar.org/vancouver",
+    "location": "",
+    "startOffsetDays": 0,
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "timeZone": "America/Vancouver"
+  },
+  {
+    "id": "sample-online-global",
+    "summary": "Global Online Meditation with the Sangha",
+    "description": "A fully online gathering open to everyone, everywhere.\nJoin via Zoom: https://zoom.us/j/987654321",
+    "location": "Online",
+    "startOffsetDays": 0,
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "timeZone": "UTC"
+  },
+  {
+    "id": "sample-london",
+    "summary": "Tergar London — Joy of Living",
+    "description": "In-person course. Register: https://tergar.org/london/register\nContact: london@tergar.org",
+    "location": "London, United Kingdom",
+    "startOffsetDays": 1,
+    "startTime": "18:30",
+    "endTime": "20:00",
+    "timeZone": "Europe/London"
+  },
+  {
+    "id": "sample-kathmandu",
+    "summary": "Tergar Kathmandu Special Retreat Day",
+    "description": "A special full-day retreat at the monastery.\nDetails: https://tergar.org/kathmandu",
+    "location": "Kathmandu, Nepal",
+    "startOffsetDays": 2,
+    "startTime": "08:00",
+    "endTime": "16:00",
+    "timeZone": "Asia/Kathmandu"
+  },
+  {
+    "id": "sample-singapore",
+    "summary": "Tergar Singapore Weekly Sangha",
+    "description": "Weekly community gathering.\nWebsite: https://tergar.org/singapore",
+    "location": "Singapore",
+    "startOffsetDays": 3,
+    "startTime": "19:30",
+    "endTime": "21:00",
+    "timeZone": "Asia/Singapore"
+  },
+  {
+    "id": "sample-online-qa",
+    "summary": "Online Q&A: Path of Liberation",
+    "description": "Virtual event. Submit questions in advance.\nhttps://zoom.us/j/555000111",
+    "location": "Virtual",
+    "startOffsetDays": 1,
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "timeZone": "UTC"
+  }
+]
