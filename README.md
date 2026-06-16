@@ -145,17 +145,17 @@ https://global-sangha-map.netlify.app). Build settings live in `netlify.toml`
 
 ---
 
-## Demo vs. live data (branch workflow)
+## Demo vs. live data
 
-The app switches data source based purely on whether
-`GOOGLE_CALENDAR_API_KEY` is set (see `lib/calendar.ts`) — no code change is
-needed to flip between them:
+The data source is controlled **entirely by whether `GOOGLE_CALENDAR_API_KEY`
+is set** (see `lib/calendar.ts`) — there is no separate branch or code change:
 
-- **`main`** — demo branch. With no API key configured it serves the bundled
-  **sample events** (`data/sample-events.json`), ideal for MVP demo meetings.
-- **`live-calendar`** — working branch for the real calendar. Set
-  `GOOGLE_CALENDAR_API_KEY` in `.env.local` (local) and in the Netlify site
-  environment (deploy) to load real events.
+- **Key set** (in `.env.local` locally, or in the Netlify site environment) →
+  loads the real Tergar calendar.
+- **Key absent** → falls back to the bundled **sample events**
+  (`data/sample-events.json`), which is handy for an offline demo.
+
+So a demo environment just leaves the key unset; production sets it.
 
 ---
 
