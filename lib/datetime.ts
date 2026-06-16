@@ -55,6 +55,52 @@ export function formatTimeInZone(iso: string, timeZone?: string): string {
   }
 }
 
+// ── Wall-clock helpers ───────────────────────────────────────────────────────
+// These read the time/date/offset directly from the ISO string as authored,
+// WITHOUT re-projecting through a named timezone. Used for online events whose
+// Google Calendar `timeZone` field is unreliable (it can disagree with the
+// offset embedded in `dateTime`), so we honor exactly what was scheduled.
+
+/** Parse the local components of an ISO string. */
+function parseIso(iso: string) {
+  const m = iso.match(
+    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::\d{2})?(Z|[+-]\d{2}:?\d{2})?/
+  );
+  if (!m) return null;
+  return {
+    date: `${m[1]}-${m[2]}-${m[3]}`,
+    hour: Number(m[4]),
+    minute: Number(m[5]),
+    offset: m[6], // "Z", "+02:00", "-05:00", or undefined
+  };
+}
+
+/** YYYY-MM-DD as authored (the organizer's local date). */
+export function wallClockDateKey(iso: string): string {
+  return parseIso(iso)?.date ?? iso.slice(0, 10);
+}
+
+/** "6:30 PM" — the authored wall-clock time, 12-hour. */
+export function wallClockTime(iso: string): string {
+  const p = parseIso(iso);
+  if (!p) return "";
+  const period = p.hour < 12 ? "AM" : "PM";
+  const h12 = p.hour % 12 === 0 ? 12 : p.hour % 12;
+  return `${h12}:${String(p.minute).padStart(2, "0")} ${period}`;
+}
+
+/** "GMT-5" / "GMT+2" / "GMT+5:45" from the authored offset (or "" if none). */
+export function wallClockOffsetLabel(iso: string): string {
+  const off = parseIso(iso)?.offset;
+  if (!off) return "";
+  if (off === "Z") return "GMT";
+  const sign = off[0];
+  const [h, m] = off.slice(1).replace(":", " ").split(" ");
+  const hh = Number(h);
+  const mm = Number(m);
+  return `GMT${sign}${hh}${mm ? `:${String(mm).padStart(2, "0")}` : ""}`;
+}
+
 /** Short timezone label, e.g. "GMT+1" or the IANA name. */
 export function timeZoneLabel(iso: string, timeZone?: string): string {
   if (!timeZone) return "";
@@ -93,9 +139,20 @@ export function getVisitorTimeZone(): string {
   }
 }
 
-/** Events whose start falls on the given date key (in the event's own zone). */
+/**
+ * The date an event "belongs to":
+ *  - in-person/hybrid → the venue's local date (event.timezone is the venue zone)
+ *  - online → the authored wall-clock date (the timeZone field is unreliable)
+ */
+export function eventDateKey(event: Event): string {
+  return event.isOnlineOnly
+    ? wallClockDateKey(event.startDate)
+    : dateKeyInTimeZone(event.startDate, event.timezone);
+}
+
+/** Events whose start falls on the given date key. */
 export function eventsForDate(events: Event[], dateKey: string): Event[] {
-  return events.filter((e) => dateKeyInTimeZone(e.startDate, e.timezone) === dateKey);
+  return events.filter((e) => eventDateKey(e) === dateKey);
 }
 
 /** Add `n` days to a YYYY-MM-DD key, returning a new key. */

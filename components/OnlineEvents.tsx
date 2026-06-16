@@ -2,7 +2,12 @@
 
 import { Event } from "@/types/Event";
 import { JoinButton } from "./JoinButton";
-import { formatTimeInZone, timeZoneLabel } from "@/lib/datetime";
+import {
+  formatTimeInZone,
+  timeZoneLabel,
+  wallClockTime,
+  wallClockOffsetLabel,
+} from "@/lib/datetime";
 
 /**
  * Online events section (specs.md FR-006).
@@ -34,15 +39,14 @@ export function OnlineEvents({
 
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {events.map((event) => {
-          const time = formatTimeInZone(event.startDate, event.timezone);
-          const tz = timeZoneLabel(event.startDate, event.timezone);
+          // Online events: show the time exactly as authored (the calendar's
+          // timeZone field is unreliable), not re-projected through a named zone.
+          const time = wallClockTime(event.startDate);
+          const tz = wallClockOffsetLabel(event.startDate);
           const localTime = formatTimeInZone(event.startDate, visitorTimeZone);
           const localTz = timeZoneLabel(event.startDate, visitorTimeZone);
           const showLocal =
-            !event.allDay &&
-            Boolean(visitorTimeZone) &&
-            event.timezone !== visitorTimeZone &&
-            time !== localTime;
+            !event.allDay && Boolean(visitorTimeZone) && `${time} ${tz}` !== `${localTime} ${localTz}`;
           const hasCta = Boolean(event.joinUrl || event.contactEmail);
           return (
             <li
