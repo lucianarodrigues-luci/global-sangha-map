@@ -1,30 +1,33 @@
 import { Event } from "@/types/Event";
 
 /**
- * Call-to-action button (specs.md FR-007, FR-008, FR-009).
+ * Call-to-action (specs.md FR-007, FR-008, FR-009).
  *
- * CTA target priority is resolved upstream in the parser (Zoom → Registration →
- * Website → Email). Here we choose an honest label for what the link does, so
- * an in-person event's "More info" link is never confused with an online
- * "Join online" link:
- *   - Zoom link         → "Join online"
- *   - Registration link → "Register"
- *   - Website link      → "More info"
- *   - Email only        → "Ask to Join"
- * Returns null when the event provides no link at all (caller shows a note).
+ * Two shapes, depending on what the event offers:
+ *
+ *  1. A link (Zoom → Registration → Website, resolved upstream) renders a pill
+ *     button with an honest label so an in-person "More info" link is never
+ *     confused with an online "Join online" link:
+ *       - Zoom link         → "Join online"
+ *       - Registration link → "Register"
+ *       - Website link      → "More info"
+ *
+ *  2. Only a contact email renders the address *visibly* as a mailto link. A
+ *     bare "Ask to Join" button looked broken when the visitor had no mail
+ *     client configured (the click appeared to do nothing) and never showed the
+ *     address to copy. Now the email is on screen, selectable, and clickable.
+ *
+ * Returns null when the event provides neither (caller shows a note).
  */
-function ctaLabel(event: Event): string {
-  if (event.joinUrl) {
-    switch (event.joinUrlKind) {
-      case "zoom":
-        return "Join online";
-      case "registration":
-        return "Register";
-      default:
-        return "More info";
-    }
+function linkLabel(kind: Event["joinUrlKind"]): string {
+  switch (kind) {
+    case "zoom":
+      return "Join online";
+    case "registration":
+      return "Register";
+    default:
+      return "More info";
   }
-  return "Ask to Join";
 }
 
 export function JoinButton({
@@ -36,29 +39,40 @@ export function JoinButton({
   size?: "sm" | "md";
   className?: string;
 }) {
-  const href = event.joinUrl
-    ? event.joinUrl
-    : event.contactEmail
-    ? `mailto:${event.contactEmail}`
-    : undefined;
+  // 1. Direct link → pill button.
+  if (event.joinUrl) {
+    const label = linkLabel(event.joinUrlKind);
+    const sizing = size === "sm" ? "px-3 py-1.5 text-sm" : "px-4 py-2.5 text-base";
+    return (
+      <a
+        href={event.joinUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${label}: ${event.title}`}
+        className={`inline-flex items-center justify-center gap-1.5 rounded-full bg-primary font-semibold text-white shadow-soft transition-colors duration-200 hover:bg-[#15336b] focus-visible:bg-[#15336b] ${sizing} ${className}`}
+      >
+        {label}
+        <span aria-hidden="true">→</span>
+      </a>
+    );
+  }
 
-  if (!href) return null;
+  // 2. Email only → visible, copyable contact address.
+  if (event.contactEmail) {
+    const subject = encodeURIComponent(`Joining: ${event.title}`);
+    return (
+      <p className={`text-sm text-space-blue/80 ${className}`}>
+        <span className="text-muted">Ask to join — email </span>
+        <a
+          href={`mailto:${event.contactEmail}?subject=${subject}`}
+          aria-label={`Email to join ${event.title}: ${event.contactEmail}`}
+          className="font-semibold text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary"
+        >
+          {event.contactEmail}
+        </a>
+      </p>
+    );
+  }
 
-  const label = ctaLabel(event);
-  const isExternal = Boolean(event.joinUrl);
-
-  const sizing = size === "sm" ? "px-3 py-1.5 text-sm" : "px-4 py-2.5 text-base";
-
-  return (
-    <a
-      href={href}
-      target={isExternal ? "_blank" : undefined}
-      rel={isExternal ? "noopener noreferrer" : undefined}
-      aria-label={`${label}: ${event.title}`}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-full bg-primary font-semibold text-white shadow-soft transition-colors duration-200 hover:bg-[#15336b] focus-visible:bg-[#15336b] ${sizing} ${className}`}
-    >
-      {label}
-      <span aria-hidden="true">→</span>
-    </a>
-  );
+  return null;
 }
