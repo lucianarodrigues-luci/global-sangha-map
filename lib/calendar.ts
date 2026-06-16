@@ -73,6 +73,13 @@ async function fetchGoogleCalendarEvents(apiKey: string): Promise<GCalEvent[]> {
     url.searchParams.set("timeMax", timeMax);
     url.searchParams.set("maxResults", "2500");
     url.searchParams.set("showDeleted", "false");
+    // Request only the fields we actually use. Keeps the response well under
+    // Next.js's 2MB data-cache limit so the 6h fetch cache (revalidate above)
+    // is honored instead of silently bypassed (the full payload is ~2.6MB).
+    url.searchParams.set(
+      "fields",
+      "nextPageToken,items(id,status,summary,description,location,start,end)"
+    );
     if (pageToken) url.searchParams.set("pageToken", pageToken);
 
     const res = await fetch(url.toString(), {
