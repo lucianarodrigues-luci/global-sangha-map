@@ -19,6 +19,7 @@ maintenance.
 - **Leaflet** + **React Leaflet** + **react-leaflet-cluster**, OpenStreetMap tiles
 - **Google Calendar API v3** for event data
 - **OpenStreetMap Nominatim** for geocoding (permanently cached as JSON)
+- **tz-lookup** to resolve a venue's IANA timezone from its coordinates
 
 No database is required.
 
@@ -108,8 +109,19 @@ from the map, and shown in the **Online Global Activities** section.
 
 ### Timezones
 
-Event times are shown in their **original timezone** and in the **visitor's
-local timezone** (auto-detected in the browser).
+Times are resolved by event type, because the source calendar's per-event
+`timeZone` field is unreliable (the `dateTime` UTC offset is the source of
+truth — see `lib/datetime.ts`):
+
+- **In-person / hybrid events** are shown in the **venue's local timezone**,
+  derived from the geocoded coordinates via `tz-lookup` (lat/lng → IANA zone).
+  So a New York event reads as New York local time regardless of how it was
+  entered.
+- **Online events** are shown at the **wall-clock time they were registered**
+  in the calendar, since there is no physical venue.
+
+Each time is also paired with the **visitor's local timezone**
+(auto-detected in the browser).
 
 ---
 
@@ -189,7 +201,7 @@ app/            page.tsx, layout.tsx, globals.css
 components/     Header, StatisticsBar, DateSelector, OnlineEvents,
                 EventSidebar, EventCard, WorldMap, JoinButton, HomeClient
 lib/            calendar.ts, parser.ts, geocoder.ts, cache.ts,
-                datetime.ts, category.ts
+                datetime.ts, category.ts, known-locations.ts
 types/          Event.ts
 data/           geocode-cache.json, sample-events.json
 public/images/  tergar-logo.png (+ horizontal / vertical source variants)
