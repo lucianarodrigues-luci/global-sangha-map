@@ -12,8 +12,7 @@ import { localDateKey } from "@/lib/datetime";
 export const revalidate = 21600; // 6 hours
 
 export default async function Page() {
-  const events = await getEvents();
-  const usingSampleData = !process.env.GOOGLE_CALENDAR_API_KEY;
+  const { events, available } = await getEvents();
   // Default selected date = current day (specs.md FR-003).
   const initialDateKey = localDateKey(new Date());
 
@@ -21,7 +20,7 @@ export default async function Page() {
     <HomeClient
       events={events}
       initialDateKey={initialDateKey}
-      usingSampleData={usingSampleData}
+      calendarUnavailable={!available}
     />
   );
 }

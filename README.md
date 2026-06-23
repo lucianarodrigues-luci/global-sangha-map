@@ -43,7 +43,7 @@ Then fill in the values:
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `GOOGLE_CALENDAR_API_KEY` | Recommended | Google Cloud API key with the **Google Calendar API** enabled. Without it, the app falls back to bundled **sample events** so the UI still renders. |
+| `GOOGLE_CALENDAR_API_KEY` | Required | Google Cloud API key with the **Google Calendar API** enabled. Without it, no events load and the app shows a "calendar unavailable" message. |
 | `GOOGLE_CALENDAR_ID` | Optional | Defaults to the public Tergar community calendar. |
 | `NOMINATIM_CONTACT_EMAIL` | Optional | Identifying contact used in the Nominatim `User-Agent` (their usage policy). |
 
@@ -152,22 +152,20 @@ https://global-sangha-map.netlify.app). Build settings live in `netlify.toml`
    `netlify deploy --prod`).
 2. Add the environment variables from `.env.example` in
    **Site settings → Environment variables** — most importantly
-   `GOOGLE_CALENDAR_API_KEY` to switch from sample data to the live calendar.
+   `GOOGLE_CALENDAR_API_KEY` so the live calendar loads.
 3. Trigger a deploy. The free tier is sufficient for the MVP.
 
 ---
 
-## Demo vs. live data
+## Live data
 
-The data source is controlled **entirely by whether `GOOGLE_CALENDAR_API_KEY`
-is set** (see `lib/calendar.ts`) — there is no separate branch or code change:
+Events come **only** from the real Tergar community calendar (see
+`lib/calendar.ts`) — the app never shows fictitious data:
 
-- **Key set** (in `.env.local` locally, or in the Netlify site environment) →
-  loads the real Tergar calendar.
-- **Key absent** → falls back to the bundled **sample events**
-  (`data/sample-events.json`), which is handy for an offline demo.
-
-So a demo environment just leaves the key unset; production sets it.
+- **`GOOGLE_CALENDAR_API_KEY` set** (in `.env.local` locally, or in the Netlify
+  site environment) → loads the real Tergar calendar.
+- **Key absent, or the Calendar API call fails** → no events are shown and the
+  UI displays a "couldn't load events, try again later" message.
 
 ---
 
@@ -203,7 +201,7 @@ components/     Header, StatisticsBar, DateSelector, OnlineEvents,
 lib/            calendar.ts, parser.ts, geocoder.ts, cache.ts,
                 datetime.ts, category.ts, known-locations.ts
 types/          Event.ts
-data/           geocode-cache.json, sample-events.json
+data/           geocode-cache.json
 public/images/  tergar-logo.png (+ horizontal / vertical source variants)
 ```
 

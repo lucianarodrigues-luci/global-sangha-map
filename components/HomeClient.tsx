@@ -34,11 +34,11 @@ function hasCoords(e: Event): boolean {
 export function HomeClient({
   events,
   initialDateKey,
-  usingSampleData,
+  calendarUnavailable,
 }: {
   events: Event[];
   initialDateKey: string;
-  usingSampleData: boolean;
+  calendarUnavailable: boolean;
 }) {
   const [selectedDate, setSelectedDate] = useState(initialDateKey);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
@@ -89,10 +89,10 @@ export function HomeClient({
       <Header />
 
       <main className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-5 sm:py-8">
-        {usingSampleData && (
+        {calendarUnavailable && (
           <p className="rounded-2xl border border-gold-tint bg-gold-tint/40 px-4 py-3 text-sm text-space-blue">
-            Showing sample preview data. Set <code>GOOGLE_CALENDAR_API_KEY</code> to
-            load live events from the Tergar community calendar.
+            We couldn&apos;t load events from the Tergar community calendar right
+            now. Please try again later.
           </p>
         )}
 
