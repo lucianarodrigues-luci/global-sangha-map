@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Netlify form detection</title>
+  </head>
+  <body>
+    <!--
+      Static "ghost" form so Netlify registers the form at deploy time.
+      Next.js renders pages dynamically, so Netlify cannot see the React
+      <form>; this file lists every field name and is what the live form
+      POSTs to. Keep field names in sync with components/SubmitGroupForm.tsx.
+    -->
+    <form
+      name="group-submission"
+      data-netlify="true"
+      netlify-honeypot="bot-field"
+      hidden
+    >
+      <input type="text" name="name" />
+      <textarea name="description"></textarea>
+      <input type="text" name="format" />
+      <input type="text" name="city" />
+      <input type="text" name="country" />
+      <input type="text" name="venue" />
+      <input type="text" name="frequency" />
+      <input type="date" name="date" />
+      <input type="text" name="day-of-week" />
+      <input type="text" name="week-of-month" />
+      <input type="time" name="start-time" />
+      <input type="time" name="end-time" />
+      <input type="text" name="timezone" />
+      <input type="url" name="online-link" />
+      <input type="url" name="registration-link" />
+      <input type="url" name="website" />
+      <input type="email" name="contact-email" />
+      <input type="text" name="submitter-name" />
+      <input type="email" name="submitter-email" />
+      <input type="text" name="bot-field" />
+    </form>
+  </body>
+</html>

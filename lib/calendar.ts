@@ -28,8 +28,6 @@ function venueTimeZone(
     return fallback;
   }
 }
-import sampleEventsRaw from "@/data/sample-events.json";
-
 /**
  * Google Calendar integration (specs.md FR-002 + Caching Requirements).
  *
@@ -39,8 +37,9 @@ import sampleEventsRaw from "@/data/sample-events.json";
  *   - A time window covers recent past → near future so date navigation works.
  *   - The fetch is cached and revalidated every 6 hours.
  *
- * No manual event entry is required. If no API key is configured the app falls
- * back to bundled sample events so the UI still renders.
+ * No manual event entry is required. If no API key is configured, or the API
+ * call fails, the app shows NO events and signals that the calendar is
+ * unavailable — it never falls back to fictitious sample data.
  */
 
 const CALENDAR_API_BASE = "https://www.googleapis.com/calendar/v3/calendars";
@@ -121,29 +120,6 @@ async function fetchGoogleCalendarEvents(apiKey: string): Promise<GCalEvent[]> {
   return items.filter((e) => e.status !== "cancelled");
 }
 
-/** Convert sample JSON (relative offsets) into GCal-shaped events. */
-function buildSampleGCalEvents(): GCalEvent[] {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  return (sampleEventsRaw as Array<Record<string, unknown>>).map((s) => {
-    const day = new Date(today);
-    day.setDate(day.getDate() + Number(s.startOffsetDays ?? 0));
-    const dayStr = day.toISOString().slice(0, 10);
-    const start = `${dayStr}T${s.startTime}:00`;
-    const end = `${dayStr}T${s.endTime}:00`;
-    return {
-      id: String(s.id),
-      status: "confirmed",
-      summary: String(s.summary ?? ""),
-      description: String(s.description ?? ""),
-      location: String(s.location ?? ""),
-      start: { dateTime: start, timeZone: String(s.timeZone ?? "UTC") },
-      end: { dateTime: end, timeZone: String(s.timeZone ?? "UTC") },
-    } satisfies GCalEvent;
-  });
-}
-
 function normalizeDateTime(dt: GCalDateTime | undefined): { iso: string; timezone?: string } {
   if (!dt) return { iso: "" };
   if (dt.dateTime) return { iso: dt.dateTime, timezone: dt.timeZone };
@@ -206,30 +182,36 @@ async function toDomainEvent(raw: GCalEvent): Promise<Event> {
   };
 }
 
+/** Result of {@link getEvents}: the processed events plus calendar status. */
+export interface CalendarResult {
+  events: Event[];
+  /** False when no API key is configured or the Calendar API call failed. */
+  available: boolean;
+}
+
 /**
- * Public entry point: returns the full, processed list of events.
- * This is the single source of truth consumed by the page / API route.
+ * Public entry point: returns the full, processed list of events and whether
+ * the live calendar was reachable. This is the single source of truth consumed
+ * by the page / API route. It never returns fictitious data — when the calendar
+ * is unavailable it returns an empty list with `available: false` so the UI can
+ * show a clear message.
  */
-export async function getEvents(): Promise<Event[]> {
+export async function getEvents(): Promise<CalendarResult> {
   const apiKey = process.env.GOOGLE_CALENDAR_API_KEY;
 
-  let rawEvents: GCalEvent[];
-  let usingSampleData = false;
-
-  if (apiKey) {
-    try {
-      rawEvents = await fetchGoogleCalendarEvents(apiKey);
-    } catch (err) {
-      console.error("[calendar] Falling back to sample data:", err);
-      rawEvents = buildSampleGCalEvents();
-      usingSampleData = true;
-    }
-  } else {
+  if (!apiKey) {
     console.warn(
-      "[calendar] GOOGLE_CALENDAR_API_KEY not set — using bundled sample events."
+      "[calendar] GOOGLE_CALENDAR_API_KEY not set — calendar unavailable."
     );
-    rawEvents = buildSampleGCalEvents();
-    usingSampleData = true;
+    return { events: [], available: false };
+  }
+
+  let rawEvents: GCalEvent[];
+  try {
+    rawEvents = await fetchGoogleCalendarEvents(apiKey);
+  } catch (err) {
+    console.error("[calendar] Calendar unavailable:", err);
+    return { events: [], available: false };
   }
 
   // Geocoding is throttled (≤1 req/s) only for cache misses; resolve sequentially.
@@ -242,10 +224,5 @@ export async function getEvents(): Promise<Event[]> {
   // Stable sort by start time.
   events.sort((a, b) => a.startDate.localeCompare(b.startDate));
 
-  if (usingSampleData) {
-    // Marker so the UI can show a gentle "preview data" note if desired.
-    (events as Event[] & { __sample?: boolean }).__sample = true;
-  }
-
-  return events;
+  return { events, available: true };
 }
