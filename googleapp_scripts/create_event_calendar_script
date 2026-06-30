@@ -1,0 +1,279 @@
+/*******************************************************
+ * GLOBAL SANGHA MAP
+ * Google Forms → Google Calendar
+ *******************************************************/
+
+const CALENDAR_ID = "c_0c988831cf79701d63839a3a49ced4746b73490e8d4d030fe95137a9d5272b0f@group.calendar.google.com";
+
+
+/*******************************************************
+ * EXECUTADO PELO TRIGGER DO FORMULÁRIO
+ *******************************************************/
+function createCalendarEvent(e) {
+
+  const data = parseFormData(e);
+
+  saveEvent(data);
+
+}
+
+
+/*******************************************************
+ * TESTE
+ *******************************************************/
+function testCalendarEvent() {
+
+  const e = {
+    namedValues: {
+
+      "Group": ["Tergar São Paulo"],
+
+      "Event Name": ["Teste Sangha Map"],
+
+      "Description": ["Evento criado automaticamente."],
+
+      "City": ["São Paulo"],
+
+      "State / Province": ["SP"],
+
+      "Country": ["Brazil"],
+
+      "Start Date": ["2026-07-15"],
+
+      "Start Time": ["19:00"],
+
+      "End Time": ["20:30"],
+
+      "Recurrence": ["Once"],
+
+      "Event Type": ["Online"],
+
+      "Website": ["https://tergar.org"],
+
+      "Zoom / Registration URL": ["https://zoom.us/j/123456"],
+
+      "Contact Email": ["test@tergar.org"]
+
+    }
+  };
+
+  createCalendarEvent(e);
+
+}
+
+
+/*******************************************************
+ * LÊ O FORMULÁRIO
+ *******************************************************/
+function parseFormData(e){
+
+  const data = e.namedValues;
+
+  const start = combineDateAndTime(
+      get(data,"Start Date"),
+      get(data,"Start Time")
+  );
+
+  const end = combineDateAndTime(
+      get(data,"Start Date"),
+      get(data,"End Time")
+  );
+
+  let location = get(data,"City");
+
+  if(get(data,"State / Province"))
+    location += ", " + get(data,"State / Province");
+
+  if(get(data,"Country"))
+    location += ", " + get(data,"Country");
+
+  return {
+
+    group:get(data,"Group"),
+
+    title:get(data,"Event Name"),
+
+    description:get(data,"Description"),
+
+    recurrence:get(data,"Recurrence"),
+
+    eventType:get(data,"Event Type"),
+
+    website:get(data,"Website"),
+
+    joinUrl:get(data,"Zoom / Registration URL"),
+
+    contactEmail:get(data,"Contact Email"),
+
+    location:location,
+
+    start:start,
+
+    end:end
+
+  };
+
+}
+
+
+/*******************************************************
+ * CRIA O EVENTO
+ *******************************************************/
+function saveEvent(data){
+
+  const calendar = CalendarApp.getCalendarById(CALENDAR_ID);
+
+  if(!calendar){
+    throw new Error("Calendar not found.");
+  }
+
+  const event = calendar.createEvent(
+
+      data.title,
+
+      data.start,
+
+      data.end,
+
+      {
+
+        description:buildDescription(data),
+
+        location:data.location
+
+      }
+
+  );
+
+  Logger.log("==============================");
+  Logger.log("EVENT CREATED");
+  Logger.log(event.getTitle());
+  Logger.log(event.getStartTime());
+  Logger.log(event.getEndTime());
+  Logger.log(event.getId());
+  Logger.log("==============================");
+
+}
+
+
+/*******************************************************
+ * DESCRIPTION
+ *******************************************************/
+function buildDescription(data){
+
+  let text="";
+
+  if(data.group){
+
+    text+="Group\n";
+    text+=data.group+"\n\n";
+
+  }
+
+  if(data.description){
+
+    text+=data.description+"\n\n";
+
+  }
+
+  if(data.eventType){
+
+    text+="Event Type\n";
+    text+=data.eventType+"\n\n";
+
+  }
+
+  if(data.recurrence){
+
+    text+="Recurrence\n";
+    text+=data.recurrence+"\n\n";
+
+  }
+
+  text+="Location\n";
+  text+=data.location+"\n\n";
+
+  if(data.website){
+
+    text+="Website\n";
+    text+=data.website+"\n\n";
+
+  }
+
+  if(data.joinUrl){
+
+    text+="Registration / Zoom\n";
+    text+=data.joinUrl+"\n\n";
+
+  }
+
+  if(data.contactEmail){
+
+    text+="Contact\n";
+    text+=data.contactEmail+"\n";
+
+  }
+
+  return text;
+
+}
+
+
+/*******************************************************
+ * COMBINA DATA + HORA
+ *******************************************************/
+function combineDateAndTime(dateString,timeString){
+
+  const date = new Date(dateString);
+
+  let hour = 0;
+  let minute = 0;
+
+  // Formato 19:30
+
+  if(timeString.indexOf("AM")==-1 && timeString.indexOf("PM")==-1){
+
+      const parts=timeString.split(":");
+
+      hour=parseInt(parts[0]);
+
+      minute=parseInt(parts[1]);
+
+  }
+
+  // Formato 3:30 PM
+
+  else{
+
+      const match=timeString.match(/(\d+):(\d+)/);
+
+      hour=parseInt(match[1]);
+
+      minute=parseInt(match[2]);
+
+      if(timeString.indexOf("PM")>-1 && hour<12)
+        hour+=12;
+
+      if(timeString.indexOf("AM")>-1 && hour==12)
+        hour=0;
+
+  }
+
+  date.setHours(hour,minute,0,0);
+
+  return date;
+
+}
+
+
+/*******************************************************
+ * HELPER
+ *******************************************************/
+function get(data,field){
+
+  if(data[field])
+    return data[field][0];
+
+  return "";
+
+}
